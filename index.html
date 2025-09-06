@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Bot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        .chat-container {
+            width: 500px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-box {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        #user-input {
+            width: 80%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #send-btn {
+            width: 18%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 2%;
+            border-radius: 5px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .user {
+            text-align: right;
+            margin: 5px 0;
+        }
+        .user .message {
+            display: inline-block;
+            background-color: #d1e7fd;
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 15px;
+        }
+        .bot {
+            text-align: left;
+            margin: 5px 0;
+        }
+        .bot .message {
+            display: inline-block;
+            background-color: #e2f7e2;
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 15px;
+        }
+        .bot .message b {
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2 style="text-align:center;">Chat Interak</h2>
+        <div id="chat-box"></div>
+        <div style="display:flex;">
+            <input type="text" id="user-input" placeholder="Escribe tu mensaje">
+            <button id="send-btn">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        sendBtn.addEventListener('click', () => {
+            const message = userInput.value;
+            if(!message) return;
+
+            chatBox.innerHTML += `<div class="user"><span class="message"><b>Tú:</b> ${message}</span></div>`;
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            })
+            .then(res => res.json())
+            .then(data => {
+                chatBox.innerHTML += `<div class="bot"><span class="message">${data.bot}</span></div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+
+            userInput.value = '';
+        });
+
+        // Permitir enviar con Enter
+        userInput.addEventListener('keyup', function(event) {
+            if(event.key === "Enter") sendBtn.click();
+        });
+    </script>
+</body>
+</html>
